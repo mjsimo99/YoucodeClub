@@ -105,7 +105,7 @@
 <!-- member end -->
 </div><!-- parent div end -->
 <!-- link for pages -->
-<a href="club.php" class="link-primary">club</a>
+<a href="login.php" class="link-primary">club</a>
 <a href="index.php" class="link-secondary">index</a>
 <a href="club.php" class="link-success">club</a>
 <a href="member.php" class="link-danger">member</a>

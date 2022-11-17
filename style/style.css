@@ -264,3 +264,30 @@ footer {
 
 
 }
+@media only screen and (max-width: 992px) {
+    .father{
+    flex-wrap: wrap;
+    justify-content: center;
+    }
+    .bannerhome{
+        flex-wrap: wrap;
+    }
+    .d-grid{
+        padding-bottom: 10%;
+    }
+    .content-wrapper{
+        flex-wrap: wrap;
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+    .content1{
+        text-align: center;
+    }
+    .text_club{
+        font-size: small;
+        margin-top: 20px;
+    }
+    .svg1{
+        margin-bottom: 20px;
+    }
+  }
