@@ -1,3 +1,31 @@
+<?php
+include("pages/cnx.php");
+session_start();
+if(isset($_SESSION["Email"]) && !empty($_SESSION["Email"]))
+{
+    header("location:index.php");
+}
+if(isset($_POST["btn-login"]))
+{
+    if(isset($_POST["email_login"]) && isset($_POST["password_login"]) && !empty($_POST["email_login"]) && !empty($_POST["password_login"]))
+    {
+        $email=htmlspecialchars($_POST["email_login"]);
+        $password=htmlspecialchars($_POST["password_login"]);
+        $req="select * from admin where Email=? and Password=?";
+        $req=$db->prepare($req);
+        $req->execute([$email,$password]);
+        if($req->rowCount()==1)
+        {
+            $_SESSION["Email"]=$email;
+            header("location:index.php");
+        }else if($req->rowCount()==0){
+            $erreur="Information Incorrect";
+        }
+    }else{
+        $erreur="You must fill  all the inputs";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +36,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/style.css">
+	<script src="script/validEmail.js" ></script>
+	<script src="script/passwordValid.js"></script>
 </head>
 <body>
 <!-- navbar -->
@@ -20,18 +50,21 @@
 <div class="vh-100 d-flex justify-content-center align-items-center">
             <div class="col-md-4 p-5 shadow-sm border rounded-3">
                 <h2 class="text-center mb-4 text-primary">Login</h2>
-                <form class="form_login">
+                <form class="form_login" method="POST" action="login.php" id="loginForm">
                     <div class="mb-3">
+                    <div style="color:red; text-align:center; width:100%;"><?php if(isset( $erreur)) echo  $erreur; ?></div>
                         <label for="exampleInputEmail1" class="form-label">Email address</label>
-                        <input type="email" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Adresse E-mail">
-                    </div>
+                        <input type="email"  name="email_login" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Adresse E-mail">
+						<div id="regexpEmail"></div>
+				   </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Password</label>
-                        <input type="password" class="form-control border border-primary" id="exampleInputPassword1" placeholder="password">
-                    </div>
+                        <input type="password"  name="password_login" class="form-control border border-primary" id="exampleInputPassword1" placeholder="password">
+						<div id="regexPassword"></div>
+					</div>
                     <p class="small"><a class="text-primary" href="forget-password.html">Forgot password?</a></p>
                     <div class="d-grid">
-                        <button class="btn btn-primary" type="submit">Login</button>
+                        <button class="btn btn-primary" name="btn-login" type="submit">Login</button>
                     </div>
                 </form>
                 <div class="mt-3">

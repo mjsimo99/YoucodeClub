@@ -5,6 +5,13 @@ if(!isset($_SESSION["Email"]) || empty($_SESSION["Email"]))
 {
     header("location:index.php");
 }
+if(isset($_GET["id"]) && !empty($_GET["id"]))
+{
+    $id=htmlspecialchars($_GET["id"]);
+}else
+{
+    header("location:index.php");
+}
 if(isset($_POST["ajout_member"]))
 {
     if(!empty($_POST["nom_member"]) && !empty($_POST["prenom_member"]) && !empty($_POST["classe_member"]) && !empty($_POST["age_member"]) && !empty($_POST["role_member"]) && !empty($_POST["club_member"]))
@@ -25,11 +32,11 @@ if(isset($_POST["ajout_member"]))
 			$n=$cname["Nom"];
 		}
 		//
-        $SiMembreExist="select * from apprenant where Nom=? and Prenom=? ";
-        $SiMembreExist=$db->prepare($SiMembreExist);
-        $SiMembreExist->execute([$nom_member,$prenom_member]);
-        if($SiMembreExist->rowCount()==0)
-        {
+        // $SiMembreExist="select * from apprenant where Nom=? and Prenom=? ";
+        // $SiMembreExist=$db->prepare($SiMembreExist);
+        // $SiMembreExist->execute([$nom_member,$prenom_member]);
+        // if($SiMembreExist->rowCount()==0)
+        // {
             if($role_member=="President")
             {
                 $ifPresidentExist="select * from apprenant where Id_club=? and Role =?";
@@ -37,33 +44,36 @@ if(isset($_POST["ajout_member"]))
                 $ifPresidentExist->execute([$club_member,$role_member]);
                 if($ifPresidentExist->rowCount()==0)
                 {
-                    $req="insert into apprenant (Nom,Prenom,Classe,Age,Role,Id_club) values (?,?,?,?,?,?)";
+                    $req="update apprenant set Nom=?,Prenom=?,Classe=?,Age=?,Role=?,Id_club=? where Id=?";
                     $req=$db->prepare($req);
-                    $req->execute([$nom_member,$prenom_member,$class_member,$age_member,$role_member,$club_member]);
+                    $req->execute([$nom_member,$prenom_member,$class_member,$age_member,$role_member,$club_member,$id]);
 					header("location:recherch.php?r=".$n);
                 }else{
                     $erreur="This club has already a President";
                 }
             }else{
-                //role =  member 
-                $req="insert into apprenant (Nom,Prenom,Classe,Age,Role,Id_club) values (?,?,?,?,?,?)";
+                $req="update apprenant set Nom=?,Prenom=?,Classe=?,Age=?,Role=?,Id_club=? where Id=?";
                 $req=$db->prepare($req);
-                $req->execute([$nom_member,$prenom_member,$class_member,$age_member,$role_member,$club_member]);
+                $req->execute([$nom_member,$prenom_member,$class_member,$age_member,$role_member,$club_member,$id]);
 				header("location:recherch.php?r=".$n);
             }   
-        }else
-        {
-            $erreur="The Member exist already in another club";
-        }
+        // }else
+        // {
+        //     $erreur="The Member exist already in another club";
+        // }
     }else
     {
         $erreur="You must fill all the inputs";
     }
 }
-//option
 $TousLesClub="select Id,Nom from club";
 $TousLesClub=$db->prepare($TousLesClub);
 $TousLesClub->execute();
+// the member to modify
+$qMember="select * from apprenant where Id=?";
+$qMember=$db->prepare($qMember);
+$qMember->execute([$id]);
+$rowMember=$qMember->fetch(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -111,7 +121,7 @@ $TousLesClub->execute();
 			<h3 class="titles_text2" style="font-weight: 300;">Organiser vos Clubs, Commencer un Club et ajouter les membres.</h3>		
 			<br><br><br>
             <div class="d-grid">
-                        <button class="btn btn-primary" type="submit" >Add Member</button>
+                        <button class="btn btn-primary" type="submit" >add Member</button>
                     </div>		
 		</div>
 	</div>
@@ -120,15 +130,15 @@ $TousLesClub->execute();
 <div id="club" class="ajout_club">
     <div class="ajout_title"><h3>Add Member </h3></div>
             <div class="col-md-4 p-5 shadow-sm border ">
-                <form method="POST" action="member.php#club" class="form_login">
+                <form method="POST" action="modify_member.php?id=<?php if(isset($id)) echo $id;?>#club" class="form_login">
                     <div style="color:red; text-align:center;"><?php if(isset($erreur)) echo $erreur; ?></div>
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">First Name:</label>
-                        <input type="text" name="nom_member" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="FirstName">
+                        <input type="text" value="<?php echo $rowMember["Nom"]; ?>" name="nom_member" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="FirstName">
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">Last Name:</label>
-                        <input type="text" name="prenom_member" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="LastName">
+                        <input type="text" value="<?php echo $rowMember["Prenom"]; ?>" name="prenom_member" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="LastName">
                     </div>
                     <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Member Class:</label>
@@ -144,7 +154,7 @@ $TousLesClub->execute();
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">Member Age:</label>
-                        <input type="text" name="age_member" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Member Age">
+                        <input type="text" value="<?php echo $rowMember["Age"]; ?>" name="age_member" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Member Age">
                     </div>
                     <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Role Member:</label>
@@ -166,12 +176,13 @@ $TousLesClub->execute();
                     </select>
                     </div>
                     <div class="d-grid">
-                        <button name="ajout_member" class="btn btn-primary" type="submit">Add Member</button>
+                        <button name="ajout_member" class="btn btn-primary" type="submit">Modify Member</button>
                     </div>
                 </form>
             </div>
 </div><!-- AjoutMemberEnd -->
 <!-- club end -->
+
   <!-- footer -->
   <footer>
   <div class="footer_text"><p><span class="yc-title-1">You</span><span class="yc-title-2">Code</span> © 2020</p></div>

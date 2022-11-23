@@ -112,6 +112,8 @@ img.d-block{
 #member{
     float: right;
     margin-right: 2%;
+    margin-top: 4px;
+
 }
 .card{
     margin-bottom: 8%;
@@ -257,7 +259,7 @@ footer {
 }
 .father{
     display: flex;
-    align-items: flex-end;
+    /* align-items: flex-end; */
     margin-left: 2%;
     margin-top: 5%;
     margin-bottom: 5%;
@@ -290,4 +292,7 @@ footer {
     .svg1{
         margin-bottom: 20px;
     }
+  }
+  .modal-content{
+    background-color: var(--bs-modal-bg)!important;
   }

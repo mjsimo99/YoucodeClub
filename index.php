@@ -1,3 +1,10 @@
+<?php
+include("pages/cnx.php");
+session_start();
+$afficheClubs="select * from club ";
+$afficheClubs=$db->prepare($afficheClubs);
+$afficheClubs->execute();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,54 +51,30 @@
 </div>
 <div class="all_cards">
   <!--div father cars -->
-<div class="card" style="width: 18rem;">
-  <img src="images/clubs/sport.png" width="100%" height="180" alt="sport" style="border:1px solid rgb(0,0,0,0.13);">    
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-      <hr>
-      <div class="member"><p id="member">Member : 0</p></div>
+  <?php
+  while($ClubsInfo=$afficheClubs->fetch())
+  {
+    $nombremembre="select * from apprenant where Id_club=?";
+    $nombremembre=$db->prepare($nombremembre);
+    $nombremembre->execute([$ClubsInfo["Id"]]);
+    $nbrMember=$nombremembre->rowCount();
+  ?>
+    <div class="card" style="width: 18rem;"> 
+        <a href="recherch.php?r=<?php echo $ClubsInfo["Nom"];?>"><img src="pages/affiche_img.php?id=<?php echo $ClubsInfo["Id"]; ?>" width="100%" height="180" alt="sport" style="border:1px solid rgb(0,0,0,0.13);"></a>    
+        <div class="card-body">
+            <a href="recherch.php?r=<?php echo $ClubsInfo["Nom"];?>" class="nav-link"><?php echo $ClubsInfo["Nom"]?></a>
+            <p class="card-text"><a class="nav-link" href="recherch.php?r=<?php echo $ClubsInfo["Nom"];?>"><?php echo $ClubsInfo["Description"]?></a></p>
+            <span style="font-size:13px; color:grey;"><?php echo $ClubsInfo["Date"]?></span>
+        </div>
+        <hr>
+        <div class="member"><p id="member">Member : <?php echo $nbrMember; ?></p></div>
     </div>
     <!-- ___________ -->
-    <div class="card" style="width: 18rem;">
-    <img src="images/clubs/robotic.png" width="100%" height="180" alt="sport" style="border:1px solid rgb(0,0,0,0.13);">    
-    
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-      <hr>
-      <div class="member"><p id="member">Member : 0</p></div>
-    </div>
-    <!-- ___________ -->
-    <div class="card" style="width: 18rem;">
-    <img src="images/clubs/art.png" width="100%" height="180" alt="sport" style="border:1px solid rgb(0,0,0,0.13);">    
-    
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-      <hr>
-      <div class="member"><p id="member">Member : 0</p></div>
-    </div>
-    <!-- ___________ -->
-    <div class="card" style="width: 18rem;">
-    <img src="images/clubs/music.png" width="100%" height="180" alt="sport" style="border:1px solid rgb(0,0,0,0.13);">    
-    
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-      <hr>
-      <div class="member"><p id="member">Member : 0</p></div>
-    </div>
-    <!-- ___________ -->
-    
- 
-  </div><!-- club end -->
-<!-- link for pages -->
-<a href="login.php" class="link-primary">club</a>
-<a href="index.php" class="link-secondary">index</a>
-<a href="club.php" class="link-success">club</a>
-<a href="member.php" class="link-danger">member</a>
-<a href="recherch.php" class="link-warning">recherch</a>
+    <?php
+}
+?>
+</div><!-- club end -->
+
   <!-- footer -->
   <footer>
     

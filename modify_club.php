@@ -1,6 +1,23 @@
 <?php
 include("pages/cnx.php");
 session_start();
+if(isset($_GET["id"]) && !empty($_GET["id"]))
+{
+    $id= htmlspecialchars($_GET["id"]);
+    $clubs="select * from club where Id=?";
+    $clubs=$db->prepare($clubs);
+    $clubs->execute([$id]);
+	$infosClubModify = $clubs->fetchAll();
+	
+}else
+{
+    header("location:index.php");
+}
+
+
+
+
+
 if(!isset($_SESSION["Email"]) || empty($_SESSION["Email"]) )
 {
     header("location:index.php");
@@ -18,9 +35,9 @@ if(isset($_POST["submit_club"]))
         $Nom_exist->execute([$nom_club]);
         if($Nom_exist->rowCount()==0)
         {
-            $req="insert into club (Nom,Logo,Date,Description ) values (?,?,?,?)";
+            $req="update club set Nom=?,Logo=?,Date=?,Description=? where Id=? ";
             $req=$db->prepare($req);
-            $req->execute([$nom_club,$logo_club,$date_club,$description_club]);
+            $req->execute([$nom_club,$logo_club,$date_club,$description_club,$id]);
 			header("location:recherch.php?r=".$nom_club);
         }else{
             $erreur="The club already exists!";
@@ -92,13 +109,16 @@ margin-bottom: 40px;">
 <!-- club -->
 <div id="club" class="ajout_club">
     <div class="ajout_title"><h3>Ajout Club </h3></div>
+	<?php
+	foreach($infosClubModify as $infoClubModify )
+	{
+	?>
             <div class="col-md-4 p-5 shadow-sm border ">
-			
-                <form class="form_login" method="POST" action="club.php#club" enctype="multipart/form-data">
+                <form class="form_login" method="POST" action="modify_club.php?id=<?php if(isset($id)) echo $id; ?>#club" enctype="multipart/form-data">
                     <div style="color:red; text-align:center;"><?php if(isset($erreur)) echo $erreur; ?></div>
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">Give the name of the Club:</label>
-                        <input type="text" name="nom_club" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Club name">
+                        <input type="text" value="<?php if(isset($infoClubModify["Nom"])) echo $infoClubModify["Nom"]; ?>" name="nom_club" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Club name">
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Logo du Club:</label>
@@ -106,17 +126,22 @@ margin-bottom: 40px;">
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Club Logo:</label>
-                        <input type="date" name="date_club" class="form-control border border-primary" id="exampleInputPassword1" placeholder="Date">
+                        <input type="date" value="<?php if(isset($infoClubModify["Date"])) echo $infoClubModify["Date"]; ?>" name="date_club" class="form-control border border-primary" id="exampleInputPassword1" placeholder="Date">
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Club Description:</label>
-                        <textarea class="form-control" name="description_club" id="exampleFormControlTextarea1" rows="3" placeholder="Club Discription..."></textarea>
+                        <textarea class="form-control" name="description_club" id="exampleFormControlTextarea1" rows="3" placeholder="Club Discription...">
+						<?php if(isset($infoClubModify["Description"])) echo $infoClubModify["Description"]; ?>
+						</textarea>
                     </div>
                     <div class="d-grid">
                         <button class="btn btn-primary" name="submit_club" type="submit">create club</button>
                     </div>
                 </form>
             </div>
+			<?php
+	}
+			?>
 </div><!-- AjoutClubEnd -->
 
 <!-- club end -->
